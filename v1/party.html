@@ -6,36 +6,142 @@
 		<center>
 			<h1>Party</h1>
 			
-			
-			<table id='board'>
+			<script type="text/javascript">
+				var Symbol = function(x,y){
+					this.active = false
+					this.roll()
+					this.x = x
+					this.y = y
+					
+				}
+				Symbol.prototype.roll = function(){
+					this.shape = Math.floor( Math.random() * 4 )
+					this.fill = Math.floor( Math.random() * 4 )
+					this.color = Math.floor( Math.random() * 4 )
+				}
+				Symbol.prototype.data = function(){
+					return [this.shape, this.fill, this.color]
+				}
+				Symbol.prototype.image = function() {
+					return "static/img/v1/" + this.shape + '-' + this.fill + '-' + this.color + '.png'
+				}
+				Symbol.prototype.print = function() {
+					return "<img class='symbol' src='" + this.image() + "' width='32' height='32' x="+this.x+" y="+this.y+" />"
+				}
+				Symbol.prototype.toggle_active = function() {
+					this.active = !this.active
+
+				}
+
+				var Board = function(width,height,party) {
+					console.log('making board')
+					this.width = width
+					this.height = height
+					this.symbols = []
+					this.party = party
+
+					for(var i = 0; i < height; i++) {
+						this.symbols[i] = []
+						$("#board").append('<tr id="row'+i+'"></tr>')
+						for(var j = 0; j < width; j++) {
+							this.symbols[i][j] = new Symbol(i,j)
+							$("#row"+i).append("<td id='"+i+"-"+j+"'>"+this.symbols[i][j].print()+"</td>")
+							
+						}
+					}
+
+					this.click = function(x,y){
+						symbol = this.symbols[x][y]
+						symbol.toggle_active()
+						$('#'+x+'-'+y).html(symbol.print())
+						$('#'+x+'-'+y+' > img').css('opacity', .5)
+						this.party.add(symbol)
+					}
+				}
+
+				var Party = function(){
+					this.symbols = []
+
+					this.draw = function(){
+						for(var i=0; i<4; i++){
+							if(this.symbols[i]){
+								$('#party'+i).html(this.symbols[i].print())
+							}
+							else{
+								$('#party'+i).html('');
+							}
+						}
+					}
+
+					this.add = function(symbol){
+						if(this.symbols.length<4){
+							this.symbols.push(symbol)
+							this.draw()
+							if(this.symbols.length==4){
+								this.is_party()
+							}
+						}
+						else{
+							alert('NO SPACE FOR GUESTS')
+						}
+					}
+					this.is_party = function(){
+						//check if symbols in this.symbols are party
+						console.log('IS IT A PARTY???')
+						var party = true
+						symbols = this.symbols
+						for(var attribute=0; attribute<2; attribute++){
+							if(symbols[0].data()[attribute] == symbols[1].data()[attribute]){
+								party = party && symbols[0].data()[attribute] == symbols[2].data()[attribute] && symbols[0].data()[attribute] == symbols[3].data()[attribute]
+							}
+							else{
+								party = party && symbols[0].data()[attribute] != symbols[2].data()[attribute] && symbols[0].data()[attribute] != symbols[3].data()[attribute]
+								party = party && symbols[1].data()[attribute] != symbols[2].data()[attribute] && symbols[1].data()[attribute] != symbols[3].data()[attribute]
+								party = party && symbols[2].data()[attribute] != symbols[3].data()[attribute]
+							}
+						}
+						//return party
+						if(party){
+							alert('YOU WON FOREVER!')
+							this.symbols = []
+							this.draw()
+						}
+						else{
+							alert('BOOOOO');
+
+						}
+					}
+				}
+
+
+
+				$(document).ready(function(){
+					var P = new Party();
+					var B = new Board(8,4,P)
+					$('.symbol').on('click', function(){
+						x = $(this).attr('x')
+						y = $(this).attr('y')
+						B.click(x,y)
+					});
+				});
+
+	
+			</script>
+
+			<!-- BOARD -->
+			<table id='party'>
 				<tr>
-					<td>1</td>
-					<td>2</td>
+					<td id='party0'></td>
+					<td id='party1'></td>
 				</tr>
 				<tr>
-					<td>3</td>
-					<td>4</td>
+					<td id='party2'></td>
+					<td id='party3'></td>
 				</tr>
 			</table>
 
 			<!-- Construct Block Pool -->
-			<table id='pool' ></table>
-			<script>
-				var i = 0; var j = 0;
-				var row;
-
-				while( i < 4 ) {
-					row = $('#pool').append('<tr />').children('tr:last')
-
-					j = 0
-					while( j < 4 ) {
-						row.append('<td>' + i + '</td>')
-						j++
-					}
-
-					i++
-				}
-			</script>
+			<table id='board' ></table>
 
 		</center>	
 	</body>
