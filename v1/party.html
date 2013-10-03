@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<script src="javascript/jquery-2.0.3.min.js"></script>
+	</head>
+	<body>
+		<center>
+			<h1>Party</h1>
+			
+			
+			<table id='board'>
+				<tr>
+					<td>1</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>4</td>
+				</tr>
+			</table>
+
+			<!-- Construct Block Pool -->
+			<table id='pool' ></table>
+			<script>
+				var i = 0; var j = 0;
+				var row;
+
+				while( i < 4 ) {
+					row = $('#pool').append('<tr />').children('tr:last')
+
+					j = 0
+					while( j < 4 ) {
+						row.append('<td>' + i + '</td>')
+						j++
+					}
+
+					i++
+				}
+			</script>
+
+		</center>	
+	</body>
+</html>
